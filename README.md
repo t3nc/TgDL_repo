@@ -1,11 +1,4 @@
-# TDL 桌面客户端 · 发布仓库
-
-> 本仓库**仅用于分发**安装包与更新日志，由 `scripts/publish-release.mjs` 自动生成，请勿手工修改。
-> 源码、构建方式与问题反馈请前往 **[t3nc/TgDL_Helper](https://github.com/t3nc/TgDL_Helper)**。
-
 ## 软件介绍
-
-# TDL 桌面客户端
 
 面向 Windows 平台的 [tdl](https://docs.iyear.me/tdl/zh/)（Telegram Downloader）图形客户端。
 把命令行工具 tdl 的下载能力封装为可视化桌面应用：**内嵌 tdl 内核、支持从 GitHub 自动更新内核**、
@@ -13,7 +6,7 @@
 
 界面为简体中文，面向不熟悉命令行的用户；架构上已为后续扩展到 macOS 预留平台分支。
 
-> 当前版本 **0.2.0**（内核 tdl 0.20.4），完整变更历史见 [UPDATELOG.md](./UPDATELOG.md)。
+> 当前版本 **0.2.0**（内核 tdl 0.20.4）。
 
 
 **最新版本：v0.2.0**（2026-09-16）
@@ -27,12 +20,6 @@
 
 - 完整校验和见 [`SHA256SUMS.txt`](./SHA256SUMS.txt)
 - 安装包**未做代码签名**，Windows SmartScreen 可能提示「未知发布者」，请核对校验和后运行
-
-## 更新日志
-
-见 [`UPDATELOG.md`](./UPDATELOG.md)。
-
----
 
 ## 许可证
 
