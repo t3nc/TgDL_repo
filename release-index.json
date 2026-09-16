@@ -1,0 +1,17 @@
+{
+  "releases": [
+    {
+      "version": "0.1.0",
+      "date": "2026-09-16",
+      "asset": "TgDL-0.1.0-x64-setup.exe",
+      "size": 11984793,
+      "sha256": "16a6cfea55463362b0d0e2e0225bf997e31f1a97c64e3dcb63a4fcda840f11b0",
+      "url": "https://github.com/t3nc/TgDL_repo/releases/download/v0.1.0/TgDL-0.1.0-x64-setup.exe"
+    }
+  ],
+  "updatedAt": "2026-09-16T01:09:18.573Z",
+  "versions": [
+    "0.1.0"
+  ],
+  "latest": "0.1.0"
+}
