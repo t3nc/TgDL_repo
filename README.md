@@ -6,15 +6,16 @@
 
 界面为简体中文，面向不熟悉命令行的用户；架构上已为后续扩展到 macOS 预留平台分支。
 
-> 当前版本 **0.2.1**（内核 tdl 0.20.4）。
+> 当前版本 **0.2.2**（内核 tdl 0.20.4）。
 
 
-**最新版本：v0.2.1**（2026-09-16）
+**最新版本：v0.2.2**（2026-09-16）
 
 ## 版本与下载
 
 | 版本 | 发布日期 | 安装包 | 大小 | SHA256 |
 | --- | --- | --- | --- | --- |
+| 0.2.2 | 2026-09-16 | [TgDL-0.2.2-x64-setup.exe](https://github.com/t3nc/TgDL_repo/releases/download/v0.2.2/TgDL-0.2.2-x64-setup.exe) | 11.47 MB | `346b9bbd4af53ca8…` |
 | 0.2.1 | 2026-09-16 | [TgDL-0.2.1-x64-setup.exe](https://github.com/t3nc/TgDL_repo/releases/download/v0.2.1/TgDL-0.2.1-x64-setup.exe) | 11.46 MB | `d9dbfb5e960f279d…` |
 | 0.2.0 | 2026-09-16 | [TgDL-0.2.0-x64-setup.exe](https://github.com/t3nc/TgDL_repo/releases/download/v0.2.0/TgDL-0.2.0-x64-setup.exe) | 11.46 MB | `e18aa370232a5c57…` |
 | 0.1.0 | 2026-09-16 | [TgDL-0.1.0-x64-setup.exe](https://github.com/t3nc/TgDL_repo/releases/download/v0.1.0/TgDL-0.1.0-x64-setup.exe) | 11.43 MB | `16a6cfea55463362…` |
