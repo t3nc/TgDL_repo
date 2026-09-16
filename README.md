@@ -3,12 +3,13 @@
 > 本仓库**仅用于分发**安装包与更新日志，由 `scripts/publish-release.mjs` 自动生成，请勿手工修改。
 > 源码、构建方式与问题反馈请前往 **[t3nc/TgDL_Helper](https://github.com/t3nc/TgDL_Helper)**。
 
-**最新版本：v0.1.0**（2026-09-16）
+**最新版本：v0.2.0**（2026-09-16）
 
 ## 下载
 
 | 版本 | 发布日期 | 安装包 | 大小 | SHA256 |
 | --- | --- | --- | --- | --- |
+| 0.2.0 | 2026-09-16 | [TgDL-0.2.0-x64-setup.exe](https://github.com/t3nc/TgDL_repo/releases/download/v0.2.0/TgDL-0.2.0-x64-setup.exe) | 11.46 MB | `e18aa370232a5c57…` |
 | 0.1.0 | 2026-09-16 | [TgDL-0.1.0-x64-setup.exe](https://github.com/t3nc/TgDL_repo/releases/download/v0.1.0/TgDL-0.1.0-x64-setup.exe) | 11.43 MB | `16a6cfea55463362…` |
 
 - 完整校验和见 [`SHA256SUMS.txt`](./SHA256SUMS.txt)
@@ -47,6 +48,7 @@
 | **重复下载检测** | 每次成功下载都记入本地历史；提交时自动识别此前下载过的链接，弹窗确认后可选「仍然全部下载」（以 `重下_` 前缀重命名，不覆盖原文件）或「跳过这些链接」；原文件已不存在时自动放行 |
 | **运行日志** | 内置只读终端（xterm.js）原样呈现 tdl 的 ANSI 输出（二维码、彩色进度条），同时提供结构化日志列表 |
 | **内核管理** | 显示当前内核版本与来源（内置 / 已更新 / 自定义路径），检查更新、分步更新进度、多版本回滚、指定版本安装 |
+| **应用自动更新** | 客户端本体从发布仓库独立分发：启动后自动检查新版本（可关闭）、横幅与弹窗提示更新内容、下载后强制比对 SHA256、静默安装并自动重启；支持「跳过此版本」 |
 | **设置中心** | 代理、存储路径、NTP、重连超时、主题外观与配置维护，全部本地持久化 |
 
 ---
@@ -192,6 +194,7 @@ src-tauri/                    后端
   src/commands/               Tauri 命令层
   src/config/                 配置模型与持久化（原子写 + 损坏回退）
   src/kernel/                 内核解析、GitHub 客户端、安装器、版本清单
+  src/app_update/             客户端本体更新（发布仓库客户端、安装包校验、安装器启动）
   src/tdl/                    ConPTY 运行器、参数构建、输出解析、URL 分块
   src/auth/                   登录状态机
   src/download/               下载队列与进度聚合
@@ -249,9 +252,9 @@ scripts/fetch-kernel.mjs      构建期预置内核（失败不中断构建）
 | --- | --- |
 | 前端类型检查（`tsc -b`） | ✅ 通过 |
 | 前端生产构建（`vite build`） | ✅ 通过 |
-| 前端单元测试（`npm test`） | ✅ 27 个全部通过（3 个测试文件） |
+| 前端单元测试（`npm test`） | ✅ 36 个全部通过（4 个测试文件） |
 | Rust 编译（`cargo test --all-targets`） | ✅ 通过，0 warning |
-| Rust 单元测试 | ✅ 102 个全部通过 |
+| Rust 单元测试 | ✅ 115 个全部通过 |
 | Rust 集成测试 | ✅ `pty_exit`（PTY 退出语义）通过；`pty_prompt` 需真实网络，默认忽略 |
 | 内嵌内核可执行 | ✅ `tdl.exe version` 输出 `0.20.4` |
 | `tauri dev` / 发布版启动 | ✅ 均通过（发布版已产出安装包） |
@@ -487,6 +490,49 @@ CRLF/ANSI 归一化、二维码图块识别、字符到模块的位映射（含�
 
 ---
 
+## 应用自动更新（客户端本体）
+
+与内核更新是两条独立链路：内核更新换的是 `tdl.exe`（装在应用数据目录，可多版本回滚），
+应用更新换的是**客户端自己**（只能下载官方安装包交给 NSIS 覆盖安装）。
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant A as 客户端（Rust）
+    participant R as 发布仓库 t3nc/TgDL_repo
+    A->>R: GET /releases/latest（主通道，带更新说明）
+    A->>R: GET release-index.json（限流时降级，含 SHA256）
+    R-->>A: version / notes / asset / sha256
+    A-->>U: 横幅 + 更新弹窗（版本对比 / 更新说明）
+    U->>A: 立即更新
+    A->>R: 下载 TgDL-<version>-x64-setup.exe（流式 + 进度）
+    A->>A: 比对 SHA256（不一致直接放弃）
+    A->>A: 启动安装器 setup.exe /S /UPDATE /R
+    A-->>U: 应用退出 → 安装完成 → 自动重启
+```
+
+**关键设计**
+
+| 决策 | 原因 |
+| --- | --- |
+| 双通道检查：Releases API 优先，`release-index.json` 降级 | 未认证 API 每小时仅 60 次；索引走 raw 域名不耗配额，且是发布脚本生成的**唯一事实源**，带每个版本的 SHA256 |
+| **强制** SHA256 校验，摘要缺失时拒绝安装 | 安装包没有代码签名（未购买证书），摘要比对是唯一的完整性防线 |
+| 安装器参数固定为 `/S /UPDATE /R` | `/S` 静默；`/UPDATE` 更新模式（不卸载旧版、跳过 WebView2、保留快捷方式与用户数据）；`/R` 安装完成后自动重启应用。安装器自身会通过 Windows Restart Manager 关闭占用中的进程 |
+| 更新前先校验令牌/凭据、下载与校验全部成功才启动安装器 | 任一步失败都只删临时文件，**当前版本不受影响**，界面可重试 |
+| 安装包落在 `%APPDATA%\com.tgdl.desktop\updates\`，每次更新前清空 | 避免残留旧安装包；与内核目录互不干扰 |
+| 应用版本取自 `tauri.conf.json` 的 `version`（运行期 `package_info()`） | 发布脚本同时强校验 `package.json` / `tauri.conf.json` / `Cargo.toml` 三处一致，防止「永远提示有新版本」 |
+
+**配置**（设置 → 应用更新）：启动时自动检查（默认开，启动 8 秒后异步执行、结果缓存 6 小时）、
+更新时使用代理（默认开）、跳过指定的版本（可在设置中恢复提示）。
+
+**已知限制**
+
+- 应用更新**只对 Windows 生效**（安装包是 NSIS）。
+- 更新链路从 **v0.2.0 起才存在**：v0.1.0 没有自动更新代码，需要手动安装一次 v0.2.0。
+- 检查更新依赖发布仓库可访问；若长期受限，可开启代理或使用加速前缀（与内核更新共用设置）。
+
+---
+
 ## 发布流程（对外分发）
 
 对外分发使用独立仓库 **[t3nc/TgDL_repo](https://github.com/t3nc/TgDL_repo)**：
@@ -510,7 +556,7 @@ npm run release:dry      # 先预演，确认无误再正式发布
 
 脚本 `scripts/publish-release.mjs` 依次完成：
 
-1. 校验 `package.json` / `tauri.conf.json` / `UPDATELOG.md` 三处版本一致（缺失更新日志条目 → 报错退出）
+1. 校验 `package.json` / `tauri.conf.json` / `Cargo.toml` / `UPDATELOG.md` 四处版本一致（缺失更新日志条目 → 报错退出）
 2. 定位安装包；缺失时自动执行 `npm run tauri:build`
 3. **校验产物文件名包含当前版本**，防止把上一次构建的旧安装包发出去
 4. 计算 SHA256，渲染并提交 `README.md` / `UPDATELOG.md` / `SHA256SUMS.txt` / `release-index.json`
