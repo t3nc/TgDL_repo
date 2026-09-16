@@ -15,7 +15,7 @@
 
 | 版本 | 发布日期 | 安装包 | 大小 | SHA256 |
 | --- | --- | --- | --- | --- |
-| 0.2.0 | 2026-09-16 | [TgDL-0.2.0-x64-setup.exe](https://github.com/t3nc/TgDL_repo/releases/download/v0.2.0/undefined) | 11.46 MB | `e18aa370232a5c57…` |
+| 0.2.0 | 2026-09-16 | [TgDL-0.2.0-x64-setup.exe](https://github.com/t3nc/TgDL_repo/releases/download/v0.2.0/TgDL-0.2.0-x64-setup.exe) | 11.46 MB | `e18aa370232a5c57…` |
 | 0.1.0 | 2026-09-16 | [TgDL-0.1.0-x64-setup.exe](https://github.com/t3nc/TgDL_repo/releases/download/v0.1.0/TgDL-0.1.0-x64-setup.exe) | 11.43 MB | `16a6cfea55463362…` |
 
 - 完整校验和见 [`SHA256SUMS.txt`](./SHA256SUMS.txt)
